@@ -1,0 +1,4 @@
+---
+staging_dir: "/root/.wp-staging"
+wordpress_db: "wordpressdb"
+wordpress_user: "wp-db-user"

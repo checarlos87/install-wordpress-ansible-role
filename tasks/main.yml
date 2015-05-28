@@ -1,0 +1,38 @@
+---
+- name: check staging area exists or create it
+  file:
+    path: "{{ staging_dir }}"
+    state: dir
+    mode: 0755
+
+- name: download wordpress
+  get_url:
+    dest: "{{ staging_dir }}"
+    url: "https://wordpress.org/latest.tar.gz"
+
+- name: untar wordpress
+  unarchive:
+    copy: no
+    src: "{{ staging_dir }}/latest.tar.gz"
+    dest: "/var/www/html"
+
+- name: create the wordpress database
+  mysql_db: 
+    name: "{{ wordpress_db }}"
+    state: present
+
+- name: generate the database password
+  command: openssl rand -base64 33
+  register: wp_db_pass
+
+- name: create the database user
+  mysql_user:
+    name: "{{ wordpress_user }}"
+    password: wp_db_pass.stdout
+    priv: "{{ wordpress_db }}.*:ALL"
+    state: present
+
+#TODO: Salty snacks and other stuff.
+
+
+    
