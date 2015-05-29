@@ -1,4 +1,5 @@
 ---
-staging_dir: "/root/.wp-staging"
+tmp_dir: "/tmp/wp-staging"
+wp_install_dir: "/var/www/html"
 wordpress_db: "wordpressdb"
 wordpress_user: "wp-db-user"

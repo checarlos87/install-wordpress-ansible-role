@@ -1,20 +1,28 @@
 ---
-- name: check staging area exists or create it
+- name: check if staging directory exists or create it
   file:
-    path: "{{ staging_dir }}"
-    state: dir
+    path: "{{ tmp_dir }}"
+    state: directory
+    mode: 0755
+
+- name: check if wp install directory exists or create it
+  file:
+    path: "{{ wp_install_dir }}"
+    state: directory
     mode: 0755
 
 - name: download wordpress
   get_url:
-    dest: "{{ staging_dir }}"
+    dest: "{{ tmp_dir }}"
     url: "https://wordpress.org/latest.tar.gz"
 
 - name: untar wordpress
   unarchive:
     copy: no
-    src: "{{ staging_dir }}/latest.tar.gz"
-    dest: "/var/www/html"
+    src: "{{ tmp_dir }}/latest.tar.gz"
+    dest: "{{ wp_install_dir }}"
+    owner: root
+    group: apache
 
 - name: create the wordpress database
   mysql_db: 
@@ -28,11 +36,22 @@
 - name: create the database user
   mysql_user:
     name: "{{ wordpress_user }}"
-    password: wp_db_pass.stdout
+    password: "{{ wp_db_pass.stdout }}"
     priv: "{{ wordpress_db }}.*:ALL"
     state: present
 
-#TODO: Salty snacks and other stuff.
+- name: download salts
+  get_url:
+    url: "https://api.wordpress.org/secret-key/1.1/salt/"
+    dest: "{{ tmp_dir }}/salts"
+    force: yes
 
+- name: get the salts
+  command: "cat {{ tmp_dir }}/salts"
+  register: salts
 
-    
+- name: render and copy wp-config 
+  template:
+    src: wp-config.php.j2
+    dest: "{{ wp_install_dir }}/wordpress/wp-config.php"
+    mode: 0644
