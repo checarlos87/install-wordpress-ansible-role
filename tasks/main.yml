@@ -32,6 +32,7 @@
 - name: generate the database password
   command: openssl rand -base64 33
   register: wp_db_pass
+  changed_when: no
 
 - name: create the database user
   mysql_user:
