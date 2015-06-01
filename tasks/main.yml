@@ -13,7 +13,7 @@
 
 - name: download wordpress
   get_url:
-    dest: "{{ tmp_dir }}"
+    dest: "{{ tmp_dir }}/latest.tar.gz"
     url: "https://wordpress.org/latest.tar.gz"
 
 - name: untar wordpress
@@ -23,6 +23,11 @@
     dest: "{{ wp_install_dir }}"
     owner: root
     group: apache
+
+- name: install mysqldb python module
+  yum:
+    name: MySQL-python
+    state: present
 
 - name: create the wordpress database
   mysql_db: 
